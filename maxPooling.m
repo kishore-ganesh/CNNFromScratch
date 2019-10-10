@@ -11,10 +11,8 @@ function [output] = maxPooling(input, poolingMatrix)
       rangeXR = rangeXL + xSize - 1;
       rangeYL = y;
       rangeYR = rangeYL + ySize -1;
-      output(floor(x/xSize)+1, floor(y/ySize)+1) = max(max(input(rangeXL:rangeXR, rangeYL:rangeYR)));            
+      output(floor(x/xSize)+1, floor(y/ySize)+1) = max(max(max(input(rangeXL:rangeXR, rangeYL:rangeYR))));            
     end
     end
 end
-
-
 

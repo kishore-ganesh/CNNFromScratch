@@ -1,3 +1,4 @@
+
 function [output] = convolve(matrix, convolveMatrix)
   % Have to adjust for mutli dimension
   paddedSizeX = size(matrix)(1)+(size(convolveMatrix)(1)-1)
@@ -10,8 +11,10 @@ function [output] = convolve(matrix, convolveMatrix)
   for x=1:1:size(paddedMatrix)(1) - size(convolveMatrix)(1) + 1;
     for y = 1:1:size(paddedMatrix)(2) - size(convolveMatrix)(2) + 1;
       subMatrix = paddedMatrix(x:x+cSize-1, y:y+cSize-1);
-      output(x, y) = sum(sum(subMatrix.*convolveMatrix)); % Should be across all dimensions
+      output(x, y) = sum(sum(sum(subMatrix.*convolveMatrix))); % Should be across all dimensions
     end
   end
-  
+
 end
+
+
