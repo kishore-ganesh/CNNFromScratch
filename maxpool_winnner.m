@@ -14,3 +14,5 @@ function [output] =maxpool_winnner(matrix,winner)
       end
      end
  end 
+
+ %Fix if slow
