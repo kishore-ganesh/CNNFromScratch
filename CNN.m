@@ -1,21 +1,23 @@
-classdef CNN
+classdef CNN < handle
 properties
 layers = []
 end
 methods
-  function addLayer(CNN, type, numberOfFilters, filterDimension)
-    CNN.layers = [CNN.layers; [type, numberOfFilters, filterDimension] ]
+    function addLayer(CNN, type, numberOfFilters, filterDimension, activationFunction, prevDimension)
+    CNN.layers = [CNN.layers; [type, numberOfFilters, filterDimension, activationFunction, prevDimension] ]
   end 
-  function constructLayers()
+  function constructLayers(CNN)
     % CNN.layers = Layers(CNN.layers)
-    CNN.layers = Layer([1])
+    disp(CNN.layers);
+    CNN.layers = Layer(CNN.layers);
   end
   function output = forwardPropagation(CNN, input)
-    prev_output = input
-    for i = 1:size(CNN.layers)(2)
-      prev_output = CNN.layers(i).layerFunction(prev_output)       
+    prev_output = input;
+    size_cnn_layers = size(CNN.layers);
+    for i = 1:size_cnn_layers(2)
+      prev_output = CNN.layers(i).layerFunction(prev_output);       
      end
-     output = prev_output
+     output = prev_output;
   end
 end
 end
