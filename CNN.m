@@ -4,7 +4,7 @@ layers = []
 end
 methods
     function addLayer(CNN, type, numberOfFilters, filterDimension, activationFunction, prevDimension)
-    CNN.layers = [CNN.layers; [type, numberOfFilters, filterDimension, activationFunction, prevDimension] ]
+    CNN.layers = [CNN.layers; [type, numberOfFilters, filterDimension, activationFunction, prevDimension] ];
   end 
   function constructLayers(CNN)
     % CNN.layers = Layers(CNN.layers)

@@ -15,17 +15,18 @@ methods
     %layer.prevDimension = prevDimension;
    %end
    function output = Layer(attributesArray)
-     %disp(attributesArray);
-     size_attribute_array = size(attributesArray);
-     m = size_attribute_array(1)
-     output(m) = output
-    for i = 1:m
-      output(i).layerType = attributesArray(i, 1);
-      output(i).numberOfFilters = attributesArray(i, 2);
-      output(i).filterDimension = attributesArray(i, 3);
-      output(i).activationFunction = attributesArray(i, 4);
-      output(i).prevDimension = attributesArray(i, 5);
-    end
+     if(nargin~=0)
+         size_attribute_array = size(attributesArray);
+         m = size_attribute_array(1)
+         output(m) = output
+         for i = 1:m
+            output(i).layerType = attributesArray(i, 1);
+            output(i).numberOfFilters = attributesArray(i, 2);
+            output(i).filterDimension = attributesArray(i, 3);
+            output(i).activationFunction = attributesArray(i, 4);
+            output(i).prevDimension = attributesArray(i, 5);
+         end
+     end
    end
   function output = layerFunction(layer, input)
     % call Convolve + Max Pooling Here
@@ -33,6 +34,9 @@ methods
     % Depending on dimension
     size_input = size(input);
     output = zeros(size_input(1), size_input(2), layer.numberOfFilters);
+    if layer.layerType == 2
+        output = zeros(size_input(1)/2, size_input(2)/2, layer.numberOfFilters)
+    end
     randomFilters = rand(layer.filterDimension,layer.filterDimension,layer.prevDimension, layer.numberOfFilters);
     disp(randomFilters(:, :, :, 1))
     i = layer.numberOfFilters;
