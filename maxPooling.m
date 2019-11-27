@@ -1,10 +1,10 @@
 function [output] = maxPooling(input, poolingMatrix)
-  size_matrix = size(poolingMatrix)
+  size_matrix = size(poolingMatrix);
   xSize = size_matrix(1);
   ySize = size_matrix(2);
-  input_size_matrix = size(input)
-  inputSizeX = input_size_matrix(1)
-  inputSizeY = input_size_matrix(2)
+  input_size_matrix = size(input);
+  inputSizeX = input_size_matrix(1);
+  inputSizeY = input_size_matrix(2);
   %Check for odd
   % We can either pad or ignore
   %  Add stride to the function
