@@ -109,7 +109,7 @@ methods
             
         % TODO: CASE 3
         case 3
-            input = reshape(input, [1, size(input, 1) * size(input, 2) * size(input, 3)]);
+            input = reshape(input', [1, size(input, 1) * size(input, 2) * size(input, 3)]);
             % disp(size(input));
             %disp(size(layer.filters(i, :)));
             output(i) = fullyConnected(layer.filters(i, :), input);
@@ -164,6 +164,7 @@ methods
           %Gradient will be routed to the right node.
           % We assign gradients to the previous layer here, since the
           % others would become zero
+          % Gradient of neuron vs gradient of weight.
           output = zeros(layer.filterDimension, layer.filterDimension, layer.prevDimension);
           %output(layer.winningIndex(1), layer.winningIndex(2)) = nextError;
           for i = 1:size(layer.winningIndex, 1)
@@ -179,6 +180,8 @@ methods
           % Fix winning index
           % This is wrong
           % What ever is connected to it will be routed
+          
+          % The error w.r.t output for prev layer would be routed.
       end
       if(layer.layerType ==  1)
           % First calculate Sigma

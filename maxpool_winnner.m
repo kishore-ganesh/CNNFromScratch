@@ -1,9 +1,9 @@
-function output = maxpool_winnner(matrix,winner)
+function output = maxpool_winnner(matrix,filterSize, winner)
   size_matrix = size(matrix);
   xsize = size_matrix(1);
   ysize = size_matrix(2);
   zsize = size_matrix(3);
-  output = zeros(xsize, ysize, zsize);
+  output = zeros(filterSize, filterSize, 3);
   for z = 1:zsize
     for y = 1:ysize
       for x = 1:xsize
@@ -18,3 +18,5 @@ function output = maxpool_winnner(matrix,winner)
  end 
 
  %Fix if slow
+ 
+ %Make this take the filter and make it the filter dimensions

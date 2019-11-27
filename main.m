@@ -32,6 +32,8 @@ end
 actualOutput = testY(1, 1:10);
 error = crossEntropy(output, actualOutput);
 layer.backwardPropagation(actualOutput, input(1, :,:));
+
+% Backpropagation for each erorr?
 %Auto initialization of output
 % Manually verify forward propagation
 % Add fully connected layer
