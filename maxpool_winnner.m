@@ -1,12 +1,9 @@
-function output = maxpool_winnner(matrix,filterSize, winner)
-  size_matrix = size(matrix);
-  xsize = size_matrix(1);
-  ysize = size_matrix(2);
-  zsize = size_matrix(3);
-  output = zeros(filterSize, filterSize, 3);
+function output = maxpool_winnner(matrix,bounds, winner)
+  zsize = size(matrix, 3);
+  output = zeros(3, 1);
   for z = 1:zsize
-    for y = 1:ysize
-      for x = 1:xsize
+    for y = bounds(2, 1):bounds(2,2)
+      for x = bounds(1, 1):bounds(1, 2)
         if (matrix(x, y,z) == winner)
           output(1) = x;
           output(2) = y;

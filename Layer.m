@@ -7,7 +7,8 @@ properties
   layerType, % 1 - Convolutional, 2 - Pooling, 3 - FUlly connected
   activationFunction % 0 - Relu, 1 - Sigmoid, 2 - Softmax
   filters,
-  layerOutput
+  layerOutput,
+  error
 end
 methods
   %function layer = Layer(layerType,numberOfFilters, filterDimension, activationFunction, prevDimension)
@@ -55,10 +56,10 @@ methods
            % disp(input);
            % input = exp(input);
             max_element = max(input);
-            min_element = min(input)
+            min_element = min(input);
             input = exp(input-max_element);
-            disp(min_element);
-            disp(max_element);
+%             disp(min_element);
+%             disp(max_element);
             
             denominator = sum(input);
             
@@ -98,14 +99,14 @@ methods
              output(:,:,i) = convolve(input, layer.filters(:, :, :, i));
               %output(:,:,i) = convn(input,layer.filters(:,:,:,i), 'same');
         case 2
-            poolingRes = maxPooling(input, layer.filters(:, :, :, i));
+            [poolingRes, layer.winningIndex] = maxPooling(input, layer.filters(:, :, :, i));
             output(:,:,i) = poolingRes;
-            layer.winningIndex = zeros(size(output, 1),size(output, 2),layer.numberOfFilters);
-            for l = 1:size(output, 1)
-                for k =1:size(output, 2)
-                     layer.winningIndex(l, k) = maxpool_winnner(layer.filters(:, :, :, i), poolingRes(l, k, i));
-                end
-            end
+            %layer.winningIndex = zeros(size(output, 1),size(output, 2),layer.numberOfFilters);
+%             for l = 1:size(output, 1)
+%                 for k =1:size(output, 2)
+%                      layer.winningIndex(l, k) = maxpool_winnner(layer.filters(:, :, :, i), poolingRes(l, k, i));
+%                 end
+%             end
             
         % TODO: CASE 3
         case 3
@@ -134,7 +135,7 @@ methods
 %     layer.layerOutput = output;
   end
   
-  function output = calculateError(layer, nextError, actualY, nextWeights, prevOutput) %Actual filters
+  function output = calculateError(layer, nextLayer, actualY, prevOutput) %Actual filters
       if(layer.layerType==3 && layer.activationFunction == 2)
         delF = layer.layerOutput * (1 - layer.layerOutput);
 %         output = (output .* layer.input)) * nextError; % Store the input too
@@ -151,7 +152,7 @@ methods
           output = zeros(size(layers.filters, 1), size(layers.filters, 2));
           for i = 1:size(layer.filters, 1)
               for j = 1:size(layer.filters, 2)
-                  s = sum(nextWeights(:, i)); 
+                  s = sum(nextLayer.filters(:, i)); 
                   output(i, j) = s;
               end
           end
@@ -165,15 +166,16 @@ methods
           % We assign gradients to the previous layer here, since the
           % others would become zero
           % Gradient of neuron vs gradient of weight.
-          output = zeros(layer.filterDimension, layer.filterDimension, layer.prevDimension);
+          %output = zeros(layer.filterDimension, layer.filterDimension, layer.prevDimension);
           %output(layer.winningIndex(1), layer.winningIndex(2)) = nextError;
           for i = 1:size(layer.winningIndex, 1)
               for j = 1:size(layer.winningIndex, 2)
-                  for k = 1:size(layer.winningIndex, 3)
-                  onedIndex = (k-1)*i*j + (i-1)*j + j;
-                  s = sum(nextWeights(:, onedIndex));
-                  output(i, j, k) = s; %Fix dimensionality
-                  end
+                  x = layer.winningIndex(i, j, 1);
+                  y = layer.winningIndex(i, j, 2);
+                  z = layer.winningIndex(i, j, 3);
+                  onedIndex = (x-1)*j+y-1;
+                  s = sum(nextLayer.filters(:, onedIndex));
+                  output(x, y, z) = s; %Fix dimensionality
               end
           end
  
@@ -191,32 +193,46 @@ methods
           output = zeros(layer.filterDimension,layer.filterDimension,layer.prevDimension,layer.numberOfFilters);
           outputDimensionX = size(layer.layerOutput, 1);
           outputDimensionY = size(layer.layerOutput, 2);
-          for k = 1 : layer.numberOfFilters
-              sigma = zeros(outputDimensionX, outputDimensionY);
-              for i = 1:outputDimensionX
+          if(nextLayer.layerType == 2)
+            sigma = zeros(outputDimensionX, outputDimensionY);
+            for i = 1 : size(nextLayer.winningIndex, 1)
+                for j = 1:size(nextLayer.winningIndex, 2)
+                    x = nextLayer.winningIndex(i, j, 1);
+                    y = nextLayer.winningIndex(i, j, 2);
+                    z = nextLayer.winningIndex(i, j, 3);
+                    sigma(x, y, z) = nextLayer.error(x, y, z);
+                end
+            end
+          else
+            for k = 1 : layer.numberOfFilters
+                sigma = zeros(outputDimensionX, outputDimensionY);
+                for i = 1:outputDimensionX
                   for j = 1:outputDimensionY
-                      for l = 1:size(nextWeights, 4)
-                          sigma = sigma + convolve(nextError(:,:,:,l), rot90(nextWeights(:, :, :, l), 2));
+                      for l = 1:size(nextLayer.filters, 4)
+                          sigma = sigma + convolve(nextLayer.error(:,:,:,l), nextLayer.filters(:, :, :, l));
                       end
+                  end
+                end
+            end
+          end
+          for i = 1:layer.filterDimension
+              for j = 1:layer.filterDimension
+                  for l = 1:layer.prevDimension
+                      layer.error = convolve(sigma, prevOutput(:, :, k));
                   end
               end
-              for i = 1:layer.filterDimension
-                  for j = 1:layer.filterDimension
-                      for l = 1:layer.prevDimension
-                          convolve(sigma, rot90(prevOutput(:, :, k), 2));
-                      end
-                  end
-              end 
           end
-%           output = convolve(nextError,rot90(nextWeights,2));
+      end
+%           output = convolve(nextError,rot90(nextLayer.filters,2));
           %summation along the third dimension
           %Sigma should  be filled along i, j, k
           %
+         layer.error = output;
       end
+      
   end
   
 %       if(layer.layerType==
           
           % Store max pooling index
-end
 end

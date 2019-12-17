@@ -15,13 +15,13 @@ methods
     size_cnn_layers = size(CNN.layers) - 1;
     for i = 1:size_cnn_layers(2)
       prev_output = CNN.layers(i).layerFunction(prev_output);       
-      size(prev_output)
+      size(prev_output);
      end
      output = prev_output;
 %      disp(output)
   end
   
-  function output = backwardPropagation(CNN, actualY, input)
+  function backwardPropagation(CNN, actualY, input)
       for i = flip(1:size(CNN.layers)-1)
           if(i~=1)
               input = CNN.layers(i);
@@ -30,7 +30,14 @@ methods
           if(i~=size(CNN.layers)-1)
               k = i; 
           end
-          err = calculateError(err, actualY, CNN.layers(k), input);
+          %Check prev output
+          if(i==1)
+              prevOutput = input;
+          else
+              prevOutput = CNN.layers(i-1).layerOutput;
+          end
+          
+          CNN.layers(i).calculateError(CNN.layers(k), actualY, CNN.layers(k), prevOutput);
       end
   end
   

@@ -20,18 +20,20 @@ numberOfSamples = 10;
 output = zeros(numberOfSamples, 10);
 input = zeros(numberOfSamples, 28, 28);
 alpha = 0.3;
-for i = 1:numberOfSamples
-    sample = trainX(i, :);
-    sample = double(sample)/2550;
-    sample = deflatten(sample);
-    input(i, :, :) = sample;
-    output(i, :) = network.forwardPropagation(sample);
-    %Check whether transpose
-    %network.forwardPropagation(dataset);
+for iterations=1:2
+    for i = 1:numberOfSamples
+        sample = trainX(i, :);
+        sample = double(sample)/2550;
+        sample = deflatten(sample);
+        input(i, :, :) = sample;
+        output(i, :) = network.forwardPropagation(sample);
+        %Check whether transpose
+        %network.forwardPropagation(dataset);
+    end
+    actualOutput = testY(1, 1:10);
+    error = crossEntropy(output, actualOutput);
+    network.backwardPropagation(actualOutput, input(1, :,:));
 end
-actualOutput = testY(1, 1:10);
-error = crossEntropy(output, actualOutput);
-layer.backwardPropagation(actualOutput, input(1, :,:));
 
 % Backpropagation for each erorr?
 %Auto initialization of output
