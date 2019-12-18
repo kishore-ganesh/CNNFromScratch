@@ -37,6 +37,15 @@ methods
           CNN.layers(i).calculateError(CNN.layers(k), actualY, prevOutput);
       end
   end
+  function print(CNN)
+      disp("CNN")
+      for i = 1:size(CNN.layers)
+          disp("Layer filters: ")
+          disp(CNN.layers(i).filters)
+          disp("Layer Output: ")
+          disp(CNN.layers(i).layerOutput)
+      end
+  end
   
 end
 end

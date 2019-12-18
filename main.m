@@ -29,15 +29,26 @@ for iterations=1:2
         output(i, :) = network.forwardPropagation(sample);
         %Check whether transpose
         %network.forwardPropagation(dataset);
+        actualOutputIndex = testY(1, i) + 1;
+        actualOutputVector = zeros(10, 1);
+        disp(actualOutputIndex);
+        actualOutputVector(actualOutputIndex) = 1;
+        
+%         network.print()
+        network.backwardPropagation(actualOutputVector, input(:,:, i));
     end
     actualOutputIndex = testY(1, 1);
     actualOutputVector = zeros(10, 1);
     actualOutputVector(actualOutputIndex) = 1;
-%     error = crossEntropy(output, actualOutput);
-    network.backwardPropagation(actualOutputVector, input(:,:, i));
+    actualOutput = testY(1,1:numberOfSamples);
+    
+    error = crossEntropy(output, actualOutput);
+    disp(error);
+%     network.backwardPropagation(actualOutputVector, input(:,:, i));
 end
 
 % Backpropagation for each erorr?
+% Batch or not?
 %Auto initialization of output
 % Manually verify forward propagation
 % Add fully connected layer

@@ -18,8 +18,12 @@ function [output, winners] = maxPooling(input, poolingMatrix)
       rangeYR = rangeYL + ySize -1;
       xIndex = floor(x/xSize)+1;
       yIndex = floor(y/ySize)+1;
-      output(xIndex, yIndex) = max(max(max(input(rangeXL:rangeXR, rangeYL:rangeYR))));            
+      output(xIndex, yIndex) = max(max(max(input(rangeXL:rangeXR, rangeYL:rangeYR, :))));            
       winners(xIndex, yIndex, :) = maxpool_winnner(input, [rangeXL, rangeXR; rangeYL, rangeYR], output(xIndex, yIndex));
+      if(winners(xIndex, yIndex, :) == [0, 0, 0])
+          disp("Err")
+      end
+      
     end
    end
 end

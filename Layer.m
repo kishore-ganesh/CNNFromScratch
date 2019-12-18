@@ -182,11 +182,11 @@ methods
                   y = layer.winningIndex(i, j, 2);
                   z = layer.winningIndex(i, j, 3);
                   onedIndex = (i-1)*size(layer.winningIndex, 2)+j;
-                  disp("Coordinates: ");
-                  disp(x);
-                  disp(y);
-                  disp(z);
-                  disp(onedIndex);
+%                   disp("Coordinates: ");
+%                   disp(x);
+%                   disp(y);
+%                   disp(z);
+%                   disp(onedIndex);
                   s = sum(nextLayer.error(:, onedIndex));
                   output(x, y, z) = s; %Fix dimensionality
               end
@@ -228,7 +228,7 @@ methods
                 end
                 sigma(:, :, k) = l;
                 for channel = 1:layer.prevDimension
-                    layer.error(:,:,channel, k) = conv2(prevOutput(1:size(layer.filters, 1),1:size(layer.filters, 2),channel), rot90(prevOutput(1:size(layer.filters, 1),2)), 'same');
+                    layer.error(:,:,channel, k) = conv2(prevOutput(1:size(layer.filters, 1),1:size(layer.filters, 2),channel), rot90(sigma(:,:,k),2), 'same');
 %                     convolve(prevOutput(1:size(layer.filters, 1),1:size(layer.filters, 2),channel), sigma(:,:,k));
                 end
             end
