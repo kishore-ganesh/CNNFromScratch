@@ -132,14 +132,20 @@ methods
      else
          output = layer.activation(output);
      end
-%     layer.layerOutput = output;
+     layer.layerOutput = output;
   end
   
   function output = calculateError(layer, nextLayer, actualY, prevOutput) %Actual filters
       if(layer.layerType==3 && layer.activationFunction == 2)
-        delF = layer.layerOutput * (1 - layer.layerOutput);
+%         delF = layer.layerOutput * (1 - layer.layerOutput);
+          delF = (1-layer.layerOutput) * -1;
+          
 %         output = (output .* layer.input)) * nextError; % Store the input too
-        output = (1./layer.layerOutput).*actualY * delF; % Check this
+           
+%         output = (1./layer.layerOutput).*actualY * delF; % Check this
+        output = repmat(delF, [1, size(layer.filters, 2)]).*repmat(prevOutput', [size(layer.filters, 1), 1]);
+        output = repmat(actualY, [1,size(layer.filters, 2)]).*output;
+
         layer.filters = layer.filters -  0.3*output; % Refactor to learning rate
       end
       if(layer.layerType==3 && layer.activationFunction == 0)
@@ -149,16 +155,17 @@ methods
           % dE/dOl = nextError * dOl+1/dOl
           % dOl+1/dOl = summation(weights associated)
           % Ith weight
-          output = zeros(size(layers.filters, 1), size(layers.filters, 2));
+          output = zeros(size(layer.filters, 1), size(layer.filters, 2));
           for i = 1:size(layer.filters, 1)
               for j = 1:size(layer.filters, 2)
-                  s = sum(nextLayer.filters(:, i)); 
+                  s = nextLayer.filters(:, i)' * nextLayer.error(:, i);
+                  %sum(nextLayer.filters(:, i)); 
                   output(i, j) = s;
               end
           end
           
           % Multiply next error here
-          output = output * nextError; % Check this
+          %output = output * nextLayer.error; % Check this
           layer.filters = layer.filters - 0.3 * output; % Next layer's errors would be an array. What are we multpiplyi8ng by?
       end
       if(layer.layerType==2)
@@ -174,7 +181,11 @@ methods
                   y = layer.winningIndex(i, j, 2);
                   z = layer.winningIndex(i, j, 3);
                   onedIndex = (x-1)*j+y-1;
-                  s = sum(nextLayer.filters(:, onedIndex));
+                  disp("Coordinates: ");
+                  disp(x);
+                  disp(y);
+                  disp(z);
+                  s = sum(nextLayer.error(:, onedIndex));
                   output(x, y, z) = s; %Fix dimensionality
               end
           end
@@ -222,6 +233,7 @@ methods
                   end
               end
           end
+          layer.filters = layer.filters - 0.3*layer.error;
       end
 %           output = convolve(nextError,rot90(nextLayer.filters,2));
           %summation along the third dimension

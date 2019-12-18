@@ -30,9 +30,11 @@ for iterations=1:2
         %Check whether transpose
         %network.forwardPropagation(dataset);
     end
-    actualOutput = testY(1, 1:10);
-    error = crossEntropy(output, actualOutput);
-    network.backwardPropagation(actualOutput, input(1, :,:));
+    actualOutputIndex = testY(1, 1);
+    actualOutputVector = zeros(10, 1);
+    actualOutputVector(actualOutputIndex) = 1;
+%     error = crossEntropy(output, actualOutput);
+    network.backwardPropagation(actualOutputVector, input(1, :,:));
 end
 
 % Backpropagation for each erorr?
