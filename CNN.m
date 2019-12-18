@@ -1,6 +1,6 @@
 classdef CNN < handle
 properties
-layers = []
+layers = [];
 end
 methods
     function addLayer(CNN, type, numberOfFilters, filterDimension, activationFunction, prevDimension)

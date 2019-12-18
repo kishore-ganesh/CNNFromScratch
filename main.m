@@ -20,7 +20,7 @@ numberOfSamples = 10;
 output = zeros(numberOfSamples, 10);
 input = zeros(28, 28, numberOfSamples);
 alpha = 0.3;
-for iterations=1:2
+for iterations=1:30
     for i = 1:numberOfSamples
         sample = trainX(i, :);
         sample = double(sample)/2550;
@@ -31,7 +31,7 @@ for iterations=1:2
         %network.forwardPropagation(dataset);
         actualOutputIndex = testY(1, i) + 1;
         actualOutputVector = zeros(10, 1);
-        disp(actualOutputIndex);
+%         disp(actualOutputIndex);
         actualOutputVector(actualOutputIndex) = 1;
         
 %         network.print()

@@ -137,6 +137,7 @@ methods
   end
   
   function output = calculateError(layer, nextLayer, actualY, prevOutput) %Actual filters
+      alpha = 0.01;
       if(layer.layerType==3 && layer.activationFunction == 2)
 %         delF = layer.layerOutput * (1 - layer.layerOutput);
           delF = (1-layer.layerOutput) * -1;
@@ -146,8 +147,8 @@ methods
 %         output = (1./layer.layerOutput).*actualY * delF; % Check this
         output = repmat(delF, [1, size(layer.filters, 2)]).*repmat(prevOutput', [size(layer.filters, 1), 1]);
         output = repmat(actualY, [1,size(layer.filters, 2)]).*output;
-
-        layer.filters = layer.filters -  0.3*output; % Refactor to learning rate
+        output = clipValue(output, 0.5);
+        layer.filters = layer.filters -  alpha*output; % Refactor to learning rate
       end
       if(layer.layerType==3 && layer.activationFunction == 0)
           % dE/dwi = dE/dO * dO/dWi
@@ -167,7 +168,8 @@ methods
           
           % Multiply next error here
           %output = output * nextLayer.error; % Check this
-          layer.filters = layer.filters - 0.3 * output; % Next layer's errors would be an array. What are we multpiplyi8ng by?
+          output = clipValue(output, 0.5);
+          layer.filters = layer.filters - alpha * output; % Next layer's errors would be an array. What are we multpiplyi8ng by?
       end
       if(layer.layerType==2)
           %Gradient will be routed to the right node.
@@ -196,7 +198,7 @@ methods
           % This is wrong
           % What ever is connected to it will be routed
           
-          % The error w.r.t output for prev layer would be routed.
+          % The error w.r.t output for prev lay0er would be routed.
       end
       if(layer.layerType ==  1)
           % First calculate Sigma
@@ -232,7 +234,7 @@ methods
 %                     convolve(prevOutput(1:size(layer.filters, 1),1:size(layer.filters, 2),channel), sigma(:,:,k));
                 end
             end
-            layer.sigma = sigma
+            layer.sigma = sigma;
 %                 for i = 1:outputDimensionX
 %                   for j = 1:outputDimensionY
 %                       for l = 1:size(nextLayer.filters, 4)
@@ -256,7 +258,8 @@ methods
 %                   end
 %               end
 %           end
-          layer.filters = layer.filters - 0.3*layer.error;
+          layer.error = clipValue(layer.error, 0.5);
+          layer.filters = layer.filters - alpha*layer.error;
       end
 %           output = convolve(nextError,rot90(nextLayer.filters,2));
           %summation along the third dimension
