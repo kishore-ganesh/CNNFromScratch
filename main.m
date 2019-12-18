@@ -18,14 +18,14 @@ network.addLayer(fullyConnectedL, 10, 1, 2, 128);
 network.constructLayers();
 numberOfSamples = 10;
 output = zeros(numberOfSamples, 10);
-input = zeros(numberOfSamples, 28, 28);
+input = zeros(28, 28, numberOfSamples);
 alpha = 0.3;
 for iterations=1:2
     for i = 1:numberOfSamples
         sample = trainX(i, :);
         sample = double(sample)/2550;
         sample = deflatten(sample);
-        input(i, :, :) = sample;
+        input(:, :, i) = sample;
         output(i, :) = network.forwardPropagation(sample);
         %Check whether transpose
         %network.forwardPropagation(dataset);
@@ -34,7 +34,7 @@ for iterations=1:2
     actualOutputVector = zeros(10, 1);
     actualOutputVector(actualOutputIndex) = 1;
 %     error = crossEntropy(output, actualOutput);
-    network.backwardPropagation(actualOutputVector, input(1, :,:));
+    network.backwardPropagation(actualOutputVector, input(:,:, i));
 end
 
 % Backpropagation for each erorr?

@@ -23,9 +23,6 @@ methods
   
   function backwardPropagation(CNN, actualY, input)
       for i = flip(1:size(CNN.layers, 2)-1)
-          if(i~=1)
-              input = CNN.layers(i);
-          end
           k = i+1;
           if(i==size(CNN.layers, 2)-1)
               k = i; 
