@@ -16,20 +16,22 @@ network.addLayer(maxPoolingL, 1, 2, 0, 64);
 network.addLayer(fullyConnectedL, 128, 1, 0, 14*14); 
 network.addLayer(fullyConnectedL, 10, 1, 2, 128); 
 network.constructLayers();
-numberOfSamples = 10;
+numberOfSamples = 10000;
 output = zeros(numberOfSamples, 10);
 input = zeros(28, 28, numberOfSamples);
 alpha = 0.3;
+%trainX = [trainX(1,:); trainX(12,:); trainX(36,:); trainX(48,:)];
+%trainY = [trainY(1), trainY(12), trainY(36), trainY(48)];
 for iterations=1:30
     for i = 1:numberOfSamples
         sample = trainX(i, :);
-        sample = double(sample)/2550;
+        sample = double(sample)/255;
         sample = deflatten(sample);
         input(:, :, i) = sample;
         output(i, :) = network.forwardPropagation(sample);
         %Check whether transpose
         %network.forwardPropagation(dataset);
-        actualOutputIndex = testY(1, i) + 1;
+        actualOutputIndex = trainY(1, i) + 1;
         actualOutputVector = zeros(10, 1);
 %         disp(actualOutputIndex);
         actualOutputVector(actualOutputIndex) = 1;
@@ -40,8 +42,8 @@ for iterations=1:30
     actualOutputIndex = testY(1, 1);
     actualOutputVector = zeros(10, 1);
     actualOutputVector(actualOutputIndex) = 1;
-    actualOutput = testY(1,1:numberOfSamples);
-    
+    actualOutput = trainY(1,1:numberOfSamples);
+    %disp(output)
     error = crossEntropy(output, actualOutput);
     disp(error);
 %     network.backwardPropagation(actualOutputVector, input(:,:, i));
