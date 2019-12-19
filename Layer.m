@@ -189,8 +189,6 @@ classdef Layer < handle
                 % We assign gradients to the previous layer here, since the
                 % others would become zero
                 % Gradient of neuron vs gradient of weight.
-                %output = zeros(layer.filterDimension, layer.filterDimension, layer.prevDimension);
-                %output(layer.winningIndex(1), layer.winningIndex(2)) = nextError;
                 for i = 1:size(layer.winningIndex, 1)
                     for j = 1:size(layer.winningIndex, 2)
                         x = layer.winningIndex(i, j, 1);
@@ -207,10 +205,8 @@ classdef Layer < handle
                     end
                 end
                 
-                % Fix winning index
-                % This is wrong
-                % What ever is connected to it will be routed
-                
+               
+                % What ever is connected to it will be routed 
                 % The error w.r.t output for prev lay0er would be routed.
                 layer.error = output;
             end
@@ -241,14 +237,6 @@ classdef Layer < handle
                     for k = 1 : layer.numberOfFilters
                         l = 0;
                         for nextFilterI = 1:nextLayer.numberOfFilters
-%                             p1 = nextLayer.sigma(:,:, nextFilterI)
-%                             p2 = nextLayer.filters(:, :, k, nextFilterI)
-                            
-                            
-%                             for mt = 1:size(p2, 1)
-%                                 for nt = 1:size(p2, 2)
-                                    
-%                                     s = s + 
                             l = l + convolve(nextLayer.sigma(:,:, nextFilterI), rot90(nextLayer.filters(:, :, k, nextFilterI), 2)); %Vectorize ths
                         end
                         sigma(:, :, k) = l;
@@ -276,48 +264,15 @@ classdef Layer < handle
                                  alternateError(mt, nt) = s;
                              end
                          end
-                         %convolvedResult = conv2(prevOutput(:,:,channel), sigma(:,:,k), 'same');
-                         %layer.error(:,:,channel, k) = convolvedResult(1:size(layer.filters, 1),1:size(layer.filters, 2));
-                        %                     convolve(prevOutput(1:size(layer.filters, 1),1:size(layer.filters, 2),channel), sigma(:,:,k));
                         layer.error(:, :, channel, k) = alternateError;
                     end
                 end
-                %                 for i = 1:outputDimensionX
-                %                   for j = 1:outputDimensionY
-                %                       for l = 1:size(nextLayer.filters, 4)
-                %                           sigma = sigma + convolve(nextLayer.error(:,:,:,l), nextLayer.filters(:, :, :, l));
-                %                       end
-                %                   end
-                %                 end
-                %             end
-            
-            %Each filter gets its own update matrix
-            %           for k = 1 : layer.numberOfFilters
-            %             disp(size(sigma(:, :, k)));
-            %             disp(size(prevOutput(:,
-            %           end
-            %
-            %           layer.error = convolve(sigma, prevOutput);
-            %           for i = 1:layer.filterDimension
-            %               for j = 1:layer.filterDimension
-            %                   for l = 1:layer.prevDimension
-            %                       layer.error = convolve(sigma, prevOutput(:, :, l));
-            %                   end
-            %               end
-            %           end
+
             layer.error = clipValue(layer.error, clipBy);
             layer.filters = layer.filters - alpha*layer.error;
             end
-        end
-        %           output = convolve(nextError,rot90(nextLayer.filters,2));
-        %summation along the third dimension
-        %Sigma should  be filled along i, j, k
-        %
-        
+        end 
     end
     
 end
 
-%       if(layer.layerType==
-
-% Store max pooling index

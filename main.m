@@ -49,11 +49,8 @@ for iterations=1:30
 %     network.backwardPropagation(actualOutputVector, input(:,:, i));
 end
 
-% Backpropagation for each erorr?
 % Batch or not?
-%Auto initialization of output
 % Manually verify forward propagation
-% Add fully connected layer
 % Remove size matrix and correct it
 % Normalization of weights before doing anything
 
@@ -62,7 +59,6 @@ end
 
 % Vectorize the input
 % Shouold automate this calculation
-% Softmax is exponential wtf - Still not solved
 % Begin backpropagation 
 % Cross verify the large values
 % Derivative: s(j) * (1-s(j))
@@ -73,9 +69,3 @@ end
 % to store these error matrices for calculating the previous layer's errors.
 % Once the error is calculated, we multiply the error matrix by the
 % learning rate, and then add to the weight matrix.
-
-% Use the inbuilt index function to calculate index
-
-% Add max poool index function
-
-% Check why that weird thing was happening
