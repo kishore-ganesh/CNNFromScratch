@@ -143,7 +143,7 @@ classdef Layer < handle
         end
         
         function output = calculateError(layer, nextLayer, actualY, prevOutput) %Actual filters
-            alpha = 0.1;
+            alpha = 0.01;
             clipBy = 0.5;
             if(layer.layerType==3 && layer.activationFunction == 2)
                 %         delF = layer.layerOutput * (1 - layer.layerOutput);
@@ -159,7 +159,8 @@ classdef Layer < handle
                 output = output .* repmat(prevOutput', [size(layer.filters, 1), 1]);
                 output = clipValue(output, clipBy);
                 layer.filters = layer.filters -  alpha*output; % Refactor to learning rate
-                layer.sigma = -actualY.*(1 - layer.layerOutput);
+%                 layer.sigma = -actualY.*(1 - layer.layerOutput);
+                layer.sigma = layer.layerOutput - actualY;
                 layer.error = output;
             end
             if(layer.layerType==3 && layer.activationFunction == 0)
@@ -170,9 +171,11 @@ classdef Layer < handle
                 % dOl+1/dOl = summation(weights associated)
                 % Ith weight
                 output = zeros(size(layer.filters, 1), size(layer.filters, 2));
+                layer.sigma = zeros(size(layer.filters, 1));
                 for i = 1:size(layer.filters, 1)
+                    layer.sigma = nextLayer.filters(:, i)' * nextLayer.sigma;
                     for j = 1:size(layer.filters, 2)
-                        s = nextLayer.filters(:, i)' * nextLayer.sigma * layer.layerInput(1, j);
+                        s = layer.sigma * layer.layerInput(1, j);
                         %sum(nextLayer.filters(:, i));
                         output(i, j) = s;
                     end
@@ -200,7 +203,7 @@ classdef Layer < handle
                         %                   disp(y);
                         %                   disp(z);
                         %                   disp(onedIndex);
-                        s = sum(nextLayer.error(:, onedIndex));
+                        s = sum(nextLayer.sigma.*nextLayer.filters(:,onedIndex));
                         output(x, y, z) = s; %Fix dimensionality
                     end
                 end
