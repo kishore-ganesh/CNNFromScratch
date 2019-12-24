@@ -10,22 +10,55 @@ maxPoolingL = 2;
 fullyConnectedL = 3;
 % Layer type, number of filters, filter dimension, activationFunction,
 % prevDimension
-network.addLayer(convolutionL, 32, 3, 0, 1);
-network.addLayer(convolutionL, 64, 3, 0, 32);
-network.addLayer(maxPoolingL, 1, 2, 0, 64);
-network.addLayer(fullyConnectedL, 128, 1, 0, 14*14); 
-network.addLayer(fullyConnectedL, 10, 1, 2, 128); 
+layerOneFilters = 32;
+layerTwoFilters = 64;
+network.addLayer(convolutionL, layerOneFilters, 3, 0, 1, 28*28, layerTwoFilters*layerOneFilters*28*28);
+network.addLayer(convolutionL, layerTwoFilters, 3, 0, layerOneFilters,layerTwoFilters*28*28*layerOneFilters, 196*128);
+network.addLayer(maxPoolingL, 1, 2, 0, layerTwoFilters,1,1);
+network.addLayer(fullyConnectedL, 128, 1, 0, 14*14, 196*128, 128*10); 
+network.addLayer(fullyConnectedL, 10, 1, 2, 128, 128*10, 10); 
 network.constructLayers();
-numberOfSamples = 10000;
+numberOfSamples = 10;
 output = zeros(numberOfSamples, 10);
 input = zeros(28, 28, numberOfSamples);
 alpha = 0.3;
-%trainX = [trainX(1,:); trainX(12,:); trainX(36,:); trainX(48,:)];
-%trainY = [trainY(1), trainY(12), trainY(36), trainY(48)];
-for iterations=1:30
+%3, 10, 21, 27, 54
+% = [trainX(1,:); trainX(3, :); trainX(12,:); trainX(10, :);trainX(36,:); trainX(21, :); trainX(48,:); trainX(27,:)];
+%trainY = [trainY(1), trainY(3), trainY(12), trainY(10), trainY(36), trainY(21), trainY(48),trainY(27)];
+newTrainX = zeros(100, 784);
+newTrainY = zeros(1,100);
+index = 1;
+for i = 0:9
+    k = 1;
+       for l = 1:size(trainY, 2)
+           if(trainY(1, l)==i)
+               newTrainX(index, :) = trainX(l, :);
+               newTrainY(1, index) = trainY(l);
+               index = index+1;
+               k = k+1;
+               if(k==11)
+                   break;
+               end
+           end
+       end
+end
+
+trainX = zeros(100,784);
+trainY = zeros(1,100);
+newIndex = randperm(100,100);
+for i = 1:100
+    trainX(i, :) = newTrainX(newIndex(i),:);
+    trainY(1, i) = newTrainY(1, newIndex(i));
+end
+                   
+% trainX = newTrainX;
+% trainY = newTrainY;
+
+for iterations=1:1000
+    numberCorrect = 0;
     for i = 1:numberOfSamples
         sample = trainX(i, :);
-        sample = double(sample)/255;
+        sample = (sample - mean(double(sample)))/std(double(sample));
         sample = deflatten(sample);
         input(:, :, i) = sample;
         output(i, :) = network.forwardPropagation(sample);
@@ -35,17 +68,38 @@ for iterations=1:30
         actualOutputVector = zeros(10, 1);
 %         disp(actualOutputIndex);
         actualOutputVector(actualOutputIndex) = 1;
+        if(max(abs(actualOutputVector - output(i,:)')) < 1e-10)
+            numberCorrect = numberCorrect + 1;
+        end
         
 %         network.print()
         network.backwardPropagation(actualOutputVector, input(:,:, i));
     end
-    actualOutputIndex = testY(1, 1);
-    actualOutputVector = zeros(10, 1);
-    actualOutputVector(actualOutputIndex) = 1;
-    actualOutput = trainY(1,1:numberOfSamples);
+  
     %disp(output)
+    actualOutput = trainY(1,1:numberOfSamples);
     error = crossEntropy(output, actualOutput);
     disp(error);
+    disp("PERC");
+    testOutputs = zeros(10,10);
+    testCorrect = 0;
+    
+%     for i=1:numberOfSamples
+%         sample = testX(i,:);
+%         sample = (sample - mean(double(sample)))/std(double(sample));
+%         sample = deflatten(sample);
+%          output(i, :) = network.forwardPropagation(sample);
+%          actualOutputIndex = testY(1, i) + 1;
+%         actualOutputVector = zeros(10, 1);
+% %         disp(actualOutputIndex);
+%         actualOutputVector(actualOutputIndex) = 1;
+%         if(max(abs(actualOutputVector - output(i,:)')) < 1e-10)
+%             testCorrect = testCorrect+1;
+%         end
+%         
+%     end
+    %disp(double(testCorrect)/numberOfSamples);
+                                      disp(1-double(numberCorrect)/numberOfSamples);
 %     network.backwardPropagation(actualOutputVector, input(:,:, i));
 end
 
