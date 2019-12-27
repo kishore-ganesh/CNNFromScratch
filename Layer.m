@@ -36,16 +36,19 @@ classdef Layer < handle
                     output(i).fanIn = attributesArray(i,6);
                     output(i).fanOut = attributesArray(i,7);
                     randomFilters = rand(output(i).filterDimension,output(i).filterDimension,output(i).prevDimension, output(i).numberOfFilters);
-                    intervalValue = sqrt(6)/sqrt(output(i).fanIn + output(i).fanOut);
-                    randomBias = rand(output(i).numberOfFilters,1);
+                    intervalValue = sqrt(2)/(output(i).fanIn);
+                    randomBias = zeros(output(i).numberOfFilters,1);
                     if(output(i).layerType==3)
                         % Should match input dimensionality
                         %randomFilters = rand(output(i).prevDimension, output(i).filterDimension);
                         randomFilters = rand(output(i).numberOfFilters, output(i).prevDimension);
+                        intervalValue = sqrt(2)/size(randomFilters, 2);
                     end
-                    randomFilters = -intervalValue + 2*intervalValue*randomFilters;
+%                     randomFilters = -intervalValue + 2*intervalValue*randomFilters;
+                    randomFilters = randomFilters * intervalValue;
                     output(i).filters = randomFilters;
-                    output(i).bias = -intervalValue + 2*intervalValue*randomBias;
+                    output(i).bias = randomBias;
+%                     output(i).bias = -intervalValue + 2*intervalValue*randomBias;
                     %Handle case for fully connected
                 end
             end
@@ -108,7 +111,8 @@ classdef Layer < handle
                         % disp(size(layer.filters));
                         % disp(layer.filters(:, :, :, i))
                         output(:,:,i) = convolve(input, layer.filters(:, :, :, i));
-                        output(:,:,i) = output(:,:,i) + layer.bias(i);
+%                         output(:,:,i) = output(:,:,i)
+%                         output(:,:,i) = output(:,:,i)+ layer.bias(i);
                         %output(:,:,i) = conv2(input,rot90(layer.filters(:,:,:,i), 2), 'same');
                     case 2
                         [poolingRes, layer.winningIndex] = maxPooling(input, layer.filters(:, :, :, i));
@@ -126,7 +130,7 @@ classdef Layer < handle
                         % disp(size(input));
                         %disp(size(layer.filters(i, :)));
                         output = fullyConnected(layer.filters, input);
-                        output = output + layer.bias;
+%                         output = output + layer.bias;
                         break;
                         % disp(size(output))
                     otherwise
@@ -137,7 +141,8 @@ classdef Layer < handle
             layer.layerInput = input;
             %    disp(layer.activation(10))
             if(layer.layerType~=2)
-                if layer.layerType ~=3
+                
+                 if layer.activationFunction~=2
                     for i = 1:size(output, 1)
                         for j = 1:size(output, 2)
                             for k = 1:size(output, 3)
@@ -146,6 +151,7 @@ classdef Layer < handle
                         end
                     end
                 else
+                    
                     output = layer.activation(output);
                 end
             end
@@ -155,7 +161,7 @@ classdef Layer < handle
         
         function output = calculateError(layer, nextLayer, actualY, prevOutput) %Actual filters
             alpha = 0.001;
-            clipBy = 0.5;
+            clipBy = 100;
             if(layer.layerType==3 && layer.activationFunction == 2)
                 %         delF = layer.layerOutput * (1 - layer.layerOutput);
                 %delF = (1-layer.layerOutput) * -1;
@@ -169,7 +175,7 @@ classdef Layer < handle
                 output = layer.sigma;
                 output = repmat(output, [1, size(layer.filters, 2)]);
                 output = output .* repmat(prevOutput', [size(layer.filters, 1), 1]);
-                output = clipValue(output, clipBy);
+%                 output = clipValue(output, clipBy);
                 layer.filters = layer.filters -  alpha*output; % Refactor to learning rate
 %                 layer.sigma = -actualY.*(1 - layer.layerOutput);
                 
@@ -186,7 +192,7 @@ classdef Layer < handle
                 output = zeros(size(layer.filters, 1), size(layer.filters, 2));
                 layer.sigma = zeros(size(layer.filters, 1),1);
                 layer.sigma = nextLayer.filters' * nextLayer.sigma;
-                layer.sigma = layer.sigma.*(layer.layerOutput==0);
+                layer.sigma = layer.sigma.*(layer.layerOutput~=0);
                 output = layer.sigma * layer.layerInput;
 %                 for i = 1:size(layer.filters, 1)
 %                     layer.sigma(i) = nextLayer.filters(:, i)' * nextLayer.sigma;
@@ -199,7 +205,7 @@ classdef Layer < handle
                 
                 % Multiply next error here
                 %output = output * nextLayer.error; % Check this
-                output = clipValue(output, clipBy);
+%                 output = clipValue(output, clipBy);
                 layer.filters = layer.filters - alpha * output; % Next layer's errors would be an array. What are we multpiplyi8ng by?
                 layer.error = output;
                 layer.bias = layer.bias - alpha * layer.sigma;
@@ -271,7 +277,7 @@ classdef Layer < handle
                 end
                 
                 layer.sigma = sigma;
-                layer.sigma = layer.sigma.*(layer.layerOutput==0);
+                layer.sigma = layer.sigma.*(layer.layerOutput~=0);
                 for k = 1:layer.numberOfFilters
                     for channel = 1:layer.prevDimension
                          alternateError = zeros(size(layer.filters, 1), size(layer.filters, 2));
@@ -297,7 +303,7 @@ classdef Layer < handle
                     layer.bias = layer.bias - alpha*sum(sum(layer.sigma(:,:,k)));
                 end
 
-            layer.error = clipValue(layer.error, clipBy);
+%             layer.error = clipValue(layer.error, clipBy);
             layer.filters = layer.filters - alpha*layer.error;
          
             end

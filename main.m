@@ -10,15 +10,15 @@ maxPoolingL = 2;
 fullyConnectedL = 3;
 % Layer type, number of filters, filter dimension, activationFunction,
 % prevDimension
-layerOneFilters = 32;
-layerTwoFilters = 64;
-network.addLayer(convolutionL, layerOneFilters, 3, 0, 1, 28*28, layerTwoFilters*layerOneFilters*28*28);
-network.addLayer(convolutionL, layerTwoFilters, 3, 0, layerOneFilters,layerTwoFilters*28*28*layerOneFilters, 196*128);
+layerOneFilters = 8;
+layerTwoFilters = 8;
+network.addLayer(convolutionL, layerOneFilters, 5, 0, 1, 28*28, layerTwoFilters*layerOneFilters*28*28);
+network.addLayer(convolutionL, layerTwoFilters, 5, 0, layerOneFilters,28*28*layerOneFilters, 196*128);
 network.addLayer(maxPoolingL, 1, 2, 0, layerTwoFilters,1,1);
-network.addLayer(fullyConnectedL, 128, 1, 0, 14*14, 196*128, 128*10); 
+network.addLayer(fullyConnectedL, 128, 1, 0, 14*14, 196, 128*10); 
 network.addLayer(fullyConnectedL, 10, 1, 2, 128, 128*10, 10); 
 network.constructLayers();
-numberOfSamples = 10;
+numberOfSamples = 100;
 output = zeros(numberOfSamples, 10);
 input = zeros(28, 28, numberOfSamples);
 alpha = 0.3;
@@ -54,7 +54,7 @@ end
 % trainX = newTrainX;
 % trainY = newTrainY;
 
-for iterations=1:1000
+for iterations=1:50000
     numberCorrect = 0;
     for i = 1:numberOfSamples
         sample = trainX(i, :);
