@@ -17,8 +17,11 @@ The loss function being used is Categorical Cross Entropy.
 
 We're using the stochachistic gradient descent algorithm with fixed learning rate and gradient clipping to train the Neural Network.
 
-On small samples it is giving promising results, however the effectiveness of the CNN can't be commented on right now since we're evaluating its performance
-and accuracy since it is taking a long time to train, in no small part due to the code not being vectorized in some places and since we only have a CPU at our disposal.
+~~On small samples it is giving promising results, however the effectiveness of the CNN can't be commented on right now since we're evaluating its performance
+  and accuracy since it is taking a long time to train, in no small part due to the code not being vectorized in some places and since we only have a CPU at our disposal.~~
+
+After training our Convolutional Neural Network on the full training set, we were able to achieve a 97.58% accuracy on the test set.
+
 
 
 
